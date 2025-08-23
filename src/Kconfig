@@ -1,14 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-config CONFIG_RTC_DRV_SURFACE
-	tristate "Intel Precise Touch & Stylus"
-	depends on INTEL_MEI
-	depends on HID
+config RTC_DRV_SURFACE
+	tristate "Microsoft Surface Aggregator RTC"
+	depends on SURFACE_AGGREGATOR
+	depends on SURFACE_AGGREGATOR_BUS
 	help
-	  Say Y here if your system has a touchscreen using Intels
-	  Precise Touch & Stylus (IPTS) technology.
-
-	  If unsure say N.
-
-	  To compile this driver as a module, choose M here: the
-	  module will be called ipts.
+	  TODO
