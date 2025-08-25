@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 
+// TODO hijack CONFIG_RTC_SYSTOHC_DEVICE/rtc0 name by moving it
+
 #include <linux/platform_device.h>
 #include <linux/rtc.h>
 
@@ -132,6 +134,7 @@ static int surface_acpi_tad_rtc_init(void) {
 		ret = -ENOTTY;
 		goto fail2;
 	}
+	BUG_ON(kernfs_type(dev_attr_time_attr_kernfs) != KERNFS_FILE);
 	struct attribute *dev_attr_time_attr = dev_attr_time_attr_kernfs->priv;
 	BUG_ON(!dev_attr_time_attr);
 	BUG_ON(strcmp(dev_attr_time_attr->name, "time"));
@@ -150,6 +153,7 @@ static int surface_acpi_tad_rtc_init(void) {
 	rtc->ops = &surface_rtc_ops;
 	rtc->range_min = RTC_TIMESTAMP_BEGIN_1900;
 	rtc->range_max = RTC_TIMESTAMP_END_9999;
+	clear_bit(RTC_FEATURE_UPDATE_INTERRUPT, rtc->features);
 	ret = devm_rtc_register_device(rtc);
 	if (ret)
 		goto fail1;
