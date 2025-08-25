@@ -3,4 +3,4 @@
 # Makefile for the driver
 #
 
-obj-$(CONFIG_RTC_DRV_SURFACE) += rtc-surface.o
+obj-$(CONFIG_RTC_DRV_SURFACE) += surface-acpi-tad-rtc.o

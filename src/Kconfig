@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 config RTC_DRV_SURFACE
-	tristate "Microsoft Surface Aggregator RTC"
-	depends on SURFACE_AGGREGATOR
-	depends on SURFACE_AGGREGATOR_BUS
+	tristate "Surface Pro 7 acpi_tad to /dev/rtc forwarding driver"
+	depends on ACPI_TAD
 	help
 	  TODO
