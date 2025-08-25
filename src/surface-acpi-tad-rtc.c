@@ -66,6 +66,10 @@ static int surface_acpi_tad_rtc_set_time(struct device *, struct rtc_time *tm)
 	struct rtc_time tm_check;
 	BUG_ON(tm->tm_sec == 60);
 	rtc_time64_to_tm(rtc_tm_to_time64(tm), &tm_check);
+	if (tm_check.tm_yday == tm->tm_yday + 1) {
+		pr_debug("surface_acpi_tad_rtc_set_time: Ignoring hwclock --set tm_yday off-by-one error\n");
+		tm->tm_yday += 1;
+	}
 	WARN_ON(memcmp(tm, &tm_check, sizeof(tm_check)));
 	tm = &tm_check;
 	pr_warn("surface_acpi_tad_rtc_set_time: after %d:%d:%d --- %d:%d:%d --- %d:%d:%d\n",
@@ -80,7 +84,7 @@ static int surface_acpi_tad_rtc_set_time(struct device *, struct rtc_time *tm)
 		tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,  tm->tm_hour, tm->tm_min, tm->tm_sec, tm->tm_isdst);
 	BUG_ON(acpi_buf_time_store_buf_count >= sizeof(acpi_buf_time_store_buf));
 	BUG_ON(acpi_buf_time_store_buf_count < sizeof("1900:1:1:0:0:0:0:0\n") - 1);
-	pr_warn("surface_acpi_tad_rtc_set_time sending %s", acpi_buf_time_store_buf);
+	pr_warn("surface_acpi_tad_rtc_set_time: sending %s", acpi_buf_time_store_buf);
 	const ssize_t ret = dev_attr_time_dev_attr->store(
 		acpi_tad_device, dev_attr_time_dev_attr, acpi_buf_time_store_buf, acpi_buf_time_store_buf_count);
 	if (ret < 0) {
