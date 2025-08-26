@@ -42,6 +42,8 @@ static int surface_acpi_tad_rtc_read_time(struct device *, struct rtc_time *tm)
 	}
 	tm->tm_mon -= 1;
 	tm->tm_year -= 1900;
+	// tm->tm_isdst = !!daylight;
+	tm->tm_isdst = 0; // unused per rtc(4)
 	WARN_ON(tz != 2047);
 	pr_warn("surface_acpi_tad_rtc_read_time: before %d:%d:%d --- %d:%d:%d --- %d:%d:%d\n",
 			tm->tm_sec, tm->tm_min, tm->tm_hour,
@@ -55,7 +57,6 @@ static int surface_acpi_tad_rtc_read_time(struct device *, struct rtc_time *tm)
 			tm->tm_sec, tm->tm_min, tm->tm_hour,
 			tm->tm_mday, tm->tm_mon, tm->tm_year,
 			tm->tm_wday, tm->tm_yday, tm->tm_isdst);
-	tm->tm_isdst = !!daylight;
 	return 0;
 }
 
@@ -68,9 +69,10 @@ static int surface_acpi_tad_rtc_set_time(struct device *, struct rtc_time *tm)
 	struct rtc_time tm_check;
 	BUG_ON(tm->tm_sec == 60);
 	rtc_time64_to_tm(rtc_tm_to_time64(tm), &tm_check);
-	if (tm_check.tm_yday == tm->tm_yday + 1) {
-		pr_debug("surface_acpi_tad_rtc_set_time: Ignoring hwclock --set tm_yday off-by-one error\n");
-		tm->tm_yday += 1;
+	{ // unused per rtc(4)
+		tm->tm_wday = tm_check.tm_wday;
+		tm->tm_yday = tm_check.tm_yday; // kernel is undocumentedly 1-indexed
+		tm->tm_isdst = tm_check.tm_isdst;
 	}
 	WARN_ON(memcmp(tm, &tm_check, sizeof(tm_check)));
 	tm = &tm_check;
